@@ -1,0 +1,6 @@
+C:\Users\Lorenzo\Desktop\ChatSocket\ClassiComuni\bin\Debug\ClassiComuni.dll
+C:\Users\Lorenzo\Desktop\ChatSocket\ClassiComuni\bin\Debug\ClassiComuni.pdb
+C:\Users\Lorenzo\Desktop\ChatSocket\ClassiComuni\obj\Debug\ClassiComuni.csproj.AssemblyReference.cache
+C:\Users\Lorenzo\Desktop\ChatSocket\ClassiComuni\obj\Debug\ClassiComuni.csproj.CoreCompileInputs.cache
+C:\Users\Lorenzo\Desktop\ChatSocket\ClassiComuni\obj\Debug\ClassiComuni.dll
+C:\Users\Lorenzo\Desktop\ChatSocket\ClassiComuni\obj\Debug\ClassiComuni.pdb

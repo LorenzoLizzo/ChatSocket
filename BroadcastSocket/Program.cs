@@ -19,9 +19,30 @@ namespace BroadcastSocket
         {
             _listaMittenti = new ObservableCollection<Mittente>();
             SetupSocketBroadcast();
+            RicezioneMessaggiBroadcast();
         }
 
-        private void RicezioneMessaggiBroadcast()
+        private static void SetupSocketBroadcast()
+        {
+            try
+            {
+                //Con InterNetwork specifico che comunico ipv4 mentre con Dgram specifico che utilizzo il protocollo udp
+                _socketBroadcast = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _socketBroadcast.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+                //Imposto l'indirizzo ip del mittente (colui che invia messaggi)
+                IPAddress local_address = IPAddress.Any;
+                //La socket del mittente necessita dell'indirizzo ip che posso ricavare dal dispositivo e di una porta
+                IPEndPoint local_endpoint = new IPEndPoint(local_address.MapToIPv4(), PORTA_BROADCAST);
+                //Associo la socket mittente ad un endpoint, tramite questa associazione ho la possibilità di inviare e ricevere dati
+                _socketBroadcast.Bind(local_endpoint);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private static void RicezioneMessaggiBroadcast()
         {
             //Non so chi è il remoteEndPoint quindi imposto i valori di default
             EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
@@ -48,27 +69,40 @@ namespace BroadcastSocket
                     int port = ((IPEndPoint)remoteEndPoint).Port;
 
                     string[] messaggioSplit = messaggio.Split('|');
-                    int porta;
-                    if (int.TryParse(messaggioSplit[2], out porta))
+                    Mittente mit = new Mittente(messaggioSplit[0], from, port);
+                    if (messaggioSplit[1] == OperazioniChatBroadcast.Entra.ToString())
                     {
-                        Mittente mit = new Mittente(messaggioSplit[0], messaggioSplit[1], porta);
-                        int indice = MittenteRegistrato(mit);
-                        if (indice == -1)
-                        {
-                            //this.Dispatcher.BeginInvoke(new Action(() =>
-                            //{
-                            //    _listaMittenti.Add(mit);
-                            //}));
-                            _listaMittenti.Add(mit);
-                        }
-                        //this.Dispatcher.BeginInvoke(new Action(() =>
-                        //{
-                        //    _listaMittenti[MittenteRegistrato(mit)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[3]));
-                        //}));
-                        _listaMittenti[MittenteRegistrato(mit)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[3]));
+                        Invia(_listaMittenti.AsEnumerable(), messaggio, from, port);
+                        _listaMittenti.Add(mit);
+                    }
+                    else if (messaggioSplit[1] == OperazioniChatBroadcast.InviaMessaggio.ToString())
+                    {
+                        Invia(_listaMittenti.Where(x => !x.Equals(mit)), messaggio, from, port, messaggioSplit[2]);
+                    }
+                    else if (messaggioSplit[1] == OperazioniChatBroadcast.Esci.ToString())
+                    {
+                        _listaMittenti.Remove(mit);
+                        Invia(_listaMittenti, messaggio, from, port);
                     }
                 }
                 //Thread.Sleep(100);
+            }
+        }
+
+        private static void Invia(IEnumerable<Mittente> lista, string messaggio, string from, int port, string messaggioBroadcast = "")
+        {
+            foreach (Mittente item in lista)
+            {
+                //Indirizzo ip del destinatario
+                IPAddress remote_address = IPAddress.Parse(item.IndirizzoIP);
+                //Socket destinatario
+                IPEndPoint remote_endpoint = new IPEndPoint(remote_address, item.Porta);
+                //Creo il messaggio da inviare al remote endpoint
+                string messaggioString = $"{messaggio}|{from}|{port}|{messaggioBroadcast}";
+                //Converto il messaggio in byte
+                byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
+                //Mando il messaggio al remote endpoint
+                _socketBroadcast.SendTo(msg, remote_endpoint);
             }
         }
     }

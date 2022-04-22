@@ -1,0 +1,10 @@
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\bin\Debug\BroadcastSocket.exe.config
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\bin\Debug\BroadcastSocket.exe
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\bin\Debug\BroadcastSocket.pdb
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\bin\Debug\ClassiComuni.dll
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\bin\Debug\ClassiComuni.pdb
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\obj\Debug\BroadcastSocket.csproj.AssemblyReference.cache
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\obj\Debug\BroadcastSocket.csproj.CoreCompileInputs.cache
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\obj\Debug\BroadcastSocket.csproj.CopyComplete
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\obj\Debug\BroadcastSocket.exe
+C:\Users\Lorenzo\Desktop\ChatSocket\BroadcastSocket\obj\Debug\BroadcastSocket.pdb

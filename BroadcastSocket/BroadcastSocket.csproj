@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClassiComuni\ClassiComuni.csproj">
+      <Project>{6BF11C89-116D-4213-BA95-25EE3432CC01}</Project>
+      <Name>ClassiComuni</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

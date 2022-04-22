@@ -28,3 +28,6 @@ C:\Users\Lorenzo\Desktop\ChatSocket\ChatSocket2\obj\Debug\ChatSocket2.csproj.Gen
 C:\Users\Lorenzo\Desktop\ChatSocket\ChatSocket2\obj\Debug\ChatSocket2.csproj.CoreCompileInputs.cache
 C:\Users\Lorenzo\Desktop\ChatSocket\ChatSocket2\obj\Debug\ChatSocket2.exe
 C:\Users\Lorenzo\Desktop\ChatSocket\ChatSocket2\obj\Debug\ChatSocket2.pdb
+C:\Users\Lorenzo\Desktop\ChatSocket\ChatSocket2\bin\Debug\ClassiComuni.dll
+C:\Users\Lorenzo\Desktop\ChatSocket\ChatSocket2\bin\Debug\ClassiComuni.pdb
+C:\Users\Lorenzo\Desktop\ChatSocket\ChatSocket2\obj\Debug\ChatSocket2.csproj.CopyComplete

@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatSocket", "ChatSocket\Ch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatSocket2", "ChatSocket2\ChatSocket2.csproj", "{243C3A2A-20D1-4A1F-860B-D199E2A73A0C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BroadcastSocket", "BroadcastSocket\BroadcastSocket.csproj", "{C503FA85-53CF-4CC1-BCA9-5EEA16F94520}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassiComuni", "ClassiComuni\ClassiComuni.csproj", "{6BF11C89-116D-4213-BA95-25EE3432CC01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{243C3A2A-20D1-4A1F-860B-D199E2A73A0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{243C3A2A-20D1-4A1F-860B-D199E2A73A0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{243C3A2A-20D1-4A1F-860B-D199E2A73A0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C503FA85-53CF-4CC1-BCA9-5EEA16F94520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C503FA85-53CF-4CC1-BCA9-5EEA16F94520}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C503FA85-53CF-4CC1-BCA9-5EEA16F94520}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C503FA85-53CF-4CC1-BCA9-5EEA16F94520}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF11C89-116D-4213-BA95-25EE3432CC01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF11C89-116D-4213-BA95-25EE3432CC01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF11C89-116D-4213-BA95-25EE3432CC01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF11C89-116D-4213-BA95-25EE3432CC01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

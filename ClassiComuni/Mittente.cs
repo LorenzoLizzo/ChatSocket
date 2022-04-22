@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ClassiComuni
 {
+    public enum OperazioniChatBroadcast { Entra, InviaMessaggio, Esci }
     public class Mittente : IEquatable<Mittente>
     {
         public Mittente(string nominativo, string indirizzoIP, int porta)
@@ -21,6 +22,17 @@ namespace ClassiComuni
         public string IndirizzoIP { get; private set; }
         public int Porta { get; private set; }
         public ObservableCollection<Messaggio> ListaMessaggi { get; private set; }
+        public int MittenteRegistrato(ObservableCollection<Mittente> listaMittenti)
+        {
+            for (int i = 0; i < listaMittenti.Count; i++)
+            {
+                if (listaMittenti[i].Equals(this))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
         public override string ToString()
         {
             return Nominativo;
