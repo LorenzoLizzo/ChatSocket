@@ -294,6 +294,10 @@ namespace ChatSocket
                 _listaMittenti[(lstBoxAgenda.SelectedItem as Mittente).MittenteRegistrato(_listaMittenti)].MessaggiNonVisualizzati = 0;
                 lstBoxAgenda.Items.Refresh();
             }
+            else
+            {
+                lstBoxMessaggi.ItemsSource = null;
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

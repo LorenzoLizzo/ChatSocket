@@ -28,7 +28,7 @@ namespace BroadcastSocket
             {
                 //Con InterNetwork specifico che comunico ipv4 mentre con Dgram specifico che utilizzo il protocollo udp
                 _socketBroadcast = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                _socketBroadcast.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+                _socketBroadcast.EnableBroadcast = true;
                 //Imposto l'indirizzo ip del mittente (colui che invia messaggi)
                 IPAddress local_address = IPAddress.Any;
                 //La socket del mittente necessita dell'indirizzo ip che posso ricavare dal dispositivo e di una porta
