@@ -52,7 +52,11 @@
                     <TextBlock Text="Inserire messaggio"/>
                     <TextBox x:Name="txtBoxMessaggio" AcceptsReturn="True" TextWrapping="Wrap" Height="130"/>
                 </StackPanel>
-                <Button x:Name="btnInvia" Content="Invia" Height="30" Width="150" Click="btnInvia_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="btnInvia" Content="Invia al singolo" Height="30" Width="150" Click="btnInvia_Click" Margin="5,0"/>
+                    <Button x:Name="btnInviaBroadcast" Content="Invia in broadcast" Height="30" Width="150" Margin="5,0" Click="btnInviaBroadcast_Click"/>
+                </StackPanel>
+                
             </StackPanel>
         </Grid>
     </Grid>

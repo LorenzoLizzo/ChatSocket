@@ -106,6 +106,17 @@ namespace ChatSocket
             //Mando il messaggio al remote endpoint
             _socket.SendTo(messaggio, endpoint);
         }
+        private void NotificaDisconnessione()
+        {
+            //Endpoint broadcast
+            IPEndPoint endpoint = new IPEndPoint(IPAddress.Broadcast, PORTA_BROADCAST);
+            //Creo il messaggio da inviare in broadcast
+            string messaggioString = $"{_nomeUtente}|{OperazioniChatBroadcast.Esci}";
+            //Converto il messaggio da inviare in byte
+            byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
+            //Mando il messaggio al remote endpoint
+            _socket.SendTo(messaggio, endpoint);
+        }
         private void SetupRicezione()
         {
             //Associo il thread al metodo di recezione e lo avvio
@@ -198,17 +209,24 @@ namespace ChatSocket
         {
             if (lstBoxAgenda.SelectedIndex != -1 && !string.IsNullOrWhiteSpace(txtBoxMessaggio.Text))
             {
-                //Indirizzo ip del destinatario
-                IPAddress remote_address = IPAddress.Parse((lstBoxAgenda.SelectedItem as Mittente).IndirizzoIP);
-                //Socket destinatario
-                IPEndPoint remote_endpoint = new IPEndPoint(remote_address, (lstBoxAgenda.SelectedItem as Mittente).Porta);
-                //Creo il messaggio da inviare al remote endpoint
-                string messaggioString = $"{_nomeUtente}|{txtBoxMessaggio.Text}";
-                //Converto il messaggio in byte
-                byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
-                //Mando il messaggio al remote endpoint
-                _socket.SendTo(messaggio, remote_endpoint);
-                _listaMittenti[(lstBoxAgenda.SelectedItem as Mittente).MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(_mittente, messaggioString.Split('|')[1]));
+                if (!txtBoxMessaggio.Text.Contains("|"))
+                {
+                    //Indirizzo ip del destinatario
+                    IPAddress remote_address = IPAddress.Parse((lstBoxAgenda.SelectedItem as Mittente).IndirizzoIP);
+                    //Socket destinatario
+                    IPEndPoint remote_endpoint = new IPEndPoint(remote_address, (lstBoxAgenda.SelectedItem as Mittente).Porta);
+                    //Creo il messaggio da inviare al remote endpoint
+                    string messaggioString = $"{_nomeUtente}|{txtBoxMessaggio.Text}";
+                    //Converto il messaggio in byte
+                    byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
+                    //Mando il messaggio al remote endpoint
+                    _socket.SendTo(messaggio, remote_endpoint);
+                    _listaMittenti[(lstBoxAgenda.SelectedItem as Mittente).MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(_mittente, messaggioString.Split('|')[1]));
+                }
+                else
+                {
+                    MessageBox.Show(@"Il messaggio non può contenere il carattere : '|'");
+                }
             }
             else
             {
@@ -224,6 +242,35 @@ namespace ChatSocket
             ////Mando il messaggio al remote endpoint
             //_socket.SendTo(messaggio, remote_endpoint);
         }
+        private void btnInviaBroadcast_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtBoxMessaggio.Text))
+            {
+                if (!txtBoxMessaggio.Text.Contains("|"))
+                {
+                    //Socket destinatario
+                    IPEndPoint remote_endpoint = new IPEndPoint(IPAddress.Broadcast, PORTA_BROADCAST);
+                    //Creo il messaggio da inviare al remote endpoint
+                    string messaggioString = $"{_nomeUtente}|{OperazioniChatBroadcast.InviaMessaggio}|{txtBoxMessaggio.Text}";
+                    //Converto il messaggio in byte
+                    byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
+                    //Mando il messaggio al remote endpoint
+                    _socket.SendTo(messaggio, remote_endpoint);
+                    foreach (Mittente mit in _listaMittenti)
+                    {
+                        mit.ListaMessaggi.Add(new Messaggio(_mittente, messaggioString.Split('|')[2]));
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(@"Il messaggio non può contenere il carattere : '|'");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Assicurati di aver scritto qualcosa nel campo del messaggio");
+            }
+        }
 
         private void lstBoxAgenda_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
@@ -238,6 +285,7 @@ namespace ChatSocket
             if (_threadRicezione != null && _threadRicezione.IsAlive)
             {
                 _threadRicezione.Abort();
+                NotificaDisconnessione();
             }
         }
 

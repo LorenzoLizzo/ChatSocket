@@ -72,26 +72,26 @@ namespace BroadcastSocket
                     Mittente mit = new Mittente(messaggioSplit[0], from, port);
                     if (messaggioSplit[1] == OperazioniChatBroadcast.Entra.ToString())
                     {
-                        Invia(_listaMittenti.AsEnumerable(), messaggio, from, port);
+                        Invia(_listaMittenti.AsEnumerable(), messaggioSplit[0], OperazioniChatBroadcast.Entra, from, port);
                         GetUtentiConnessi(_listaMittenti.AsEnumerable(), from, port);
 
                         _listaMittenti.Add(mit);
                     }
                     else if (messaggioSplit[1] == OperazioniChatBroadcast.InviaMessaggio.ToString())
                     {
-                        Invia(_listaMittenti.Where(x => !x.Equals(mit)), messaggio, from, port, messaggioSplit[2]);
+                        Invia(_listaMittenti.Where(x => !x.Equals(mit)), messaggioSplit[0], OperazioniChatBroadcast.InviaMessaggio, from, port, messaggioSplit[2]);
                     }
                     else if (messaggioSplit[1] == OperazioniChatBroadcast.Esci.ToString())
                     {
                         _listaMittenti.Remove(mit);
-                        Invia(_listaMittenti, messaggio, from, port);
+                        Invia(_listaMittenti, messaggioSplit[0], OperazioniChatBroadcast.Esci, from, port);
                     }
                 }
                 //Thread.Sleep(100);
             }
         }
 
-        private static void Invia(IEnumerable<Mittente> lista, string messaggio, string from, int port, string messaggioBroadcast = "")
+        private static void Invia(IEnumerable<Mittente> lista, string nominativo, OperazioniChatBroadcast operazione, string from, int port, string messaggioBroadcast = "")
         {
             foreach (Mittente item in lista)
             {
@@ -100,7 +100,7 @@ namespace BroadcastSocket
                 //Socket destinatario
                 IPEndPoint remote_endpoint = new IPEndPoint(remote_address, item.Porta);
                 //Creo il messaggio da inviare al remote endpoint
-                string messaggioString = $"{messaggio}|{from}|{port}|{messaggioBroadcast}";
+                string messaggioString = $"{nominativo}|{operazione}|{from}|{port}|{messaggioBroadcast}";
                 //Converto il messaggio in byte
                 byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
                 //Mando il messaggio al remote endpoint
