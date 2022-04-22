@@ -73,6 +73,8 @@ namespace BroadcastSocket
                     if (messaggioSplit[1] == OperazioniChatBroadcast.Entra.ToString())
                     {
                         Invia(_listaMittenti.AsEnumerable(), messaggio, from, port);
+                        GetUtentiConnessi(_listaMittenti.AsEnumerable(), from, port);
+
                         _listaMittenti.Add(mit);
                     }
                     else if (messaggioSplit[1] == OperazioniChatBroadcast.InviaMessaggio.ToString())
@@ -99,6 +101,23 @@ namespace BroadcastSocket
                 IPEndPoint remote_endpoint = new IPEndPoint(remote_address, item.Porta);
                 //Creo il messaggio da inviare al remote endpoint
                 string messaggioString = $"{messaggio}|{from}|{port}|{messaggioBroadcast}";
+                //Converto il messaggio in byte
+                byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
+                //Mando il messaggio al remote endpoint
+                _socketBroadcast.SendTo(msg, remote_endpoint);
+            }
+        }
+
+        private static void GetUtentiConnessi(IEnumerable<Mittente> lista, string from, int port)
+        {
+            //Indirizzo ip del destinatario
+            IPAddress remote_address = IPAddress.Parse(from);
+            //Socket destinatario
+            IPEndPoint remote_endpoint = new IPEndPoint(remote_address, port);
+            foreach (Mittente item in lista)
+            {
+                //Creo il messaggio da inviare al remote endpoint
+                string messaggioString = $"{item.Nominativo}|{OperazioniChatBroadcast.Entra}|{item.IndirizzoIP}|{item.Porta}";
                 //Converto il messaggio in byte
                 byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
                 //Mando il messaggio al remote endpoint

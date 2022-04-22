@@ -19,9 +19,9 @@ namespace ChatSocket
         private Thread _threadRicezione;
         private Socket _socket;
         private ObservableCollection<Mittente> _listaMittenti;
-        private const int PORTA = 65000;
+        private int PORTA;
         private const int PORTA_BROADCAST = 60000;
-        private string _nomeUtente = "Utente1";
+        private string _nomeUtente;
         //DispatcherTimer dTimer = null;
 
         public MainWindow()
@@ -29,20 +29,53 @@ namespace ChatSocket
             try
             {
                 InitializeComponent();
-                _listaMittenti = new ObservableCollection<Mittente>();
-                lstBoxAgenda.ItemsSource = _listaMittenti;
-
-                SetupSocket();
-                _mittente = new Mittente("Tu", (_socket.LocalEndPoint as IPEndPoint).Address.ToString(), PORTA);
-                NotificaConnessione();
-                SetupRicezione();
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
+        private void btnEntra_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!txtBoxNomeUtente.Text.Contains("|"))
+                {
+                    if (int.Parse(txtBoxPorta.Text) >= 49152 && int.Parse(txtBoxPorta.Text) <= 65535)
+                    {
+                        Setup();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Selezionare una tra le porte specificate e assicurarsi che la porta in questione sia libera");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(@"Il nome utente non può contenere il carattere : '|'");
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void Setup()
+        {
+            _nomeUtente = txtBoxNomeUtente.Text;
+            PORTA = int.Parse(txtBoxPorta.Text);
+            gridPorta.Visibility = Visibility.Collapsed;
+            gridChat.Visibility = Visibility.Visible;
 
+            _listaMittenti = new ObservableCollection<Mittente>();
+            lstBoxAgenda.ItemsSource = _listaMittenti;
+
+            SetupSocket();
+            _mittente = new Mittente("Tu", (_socket.LocalEndPoint as IPEndPoint).Address.ToString(), PORTA);
+            NotificaConnessione();
+            SetupRicezione();
+        }
         private void SetupSocket()
         {
             try
@@ -202,7 +235,10 @@ namespace ChatSocket
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _threadRicezione.Abort();
+            if (_threadRicezione != null && _threadRicezione.IsAlive)
+            {
+                _threadRicezione.Abort();
+            }
         }
 
         //private void aggiornamento_dTimer(object sender, EventArgs e)

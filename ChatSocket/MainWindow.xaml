@@ -5,30 +5,56 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChatSocket"
         mc:Ignorable="d"
-        Title="Porta: 65000" Height="450" Width="800" Closing="Window_Closing">
+        Title="Chat" Height="450" Width="800" Closing="Window_Closing" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Grid x:Name="gridPorta" VerticalAlignment="Center" Margin="50">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Inserisci la porta a cui vuoi collegare la tua chat (49152-65535)" FontSize="30" TextWrapping="Wrap" FontWeight="DemiBold" Margin="0,0,0,10"/>
 
-        <ListBox x:Name="lstBoxMessaggi" Grid.Column="0" Grid.RowSpan="2" Margin="8"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Nome Utente:" FontSize="30" FontWeight="DemiBold" VerticalAlignment="Center" Margin="0,0,0,10"/>
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtBoxNomeUtente" FontSize="30" FontWeight="Bold" Margin="10,0,0,10"/>
 
-        <DockPanel Grid.Column="1" Grid.Row="0" Margin="8">
-            <TextBlock Text="Agenda" DockPanel.Dock="Top"/>
-            <ListBox x:Name="lstBoxAgenda" SelectionChanged="lstBoxAgenda_SelectionChanged"/>
-        </DockPanel>
-        
-        <StackPanel Grid.Column="1" Grid.Row="1" Margin="8">
-            <StackPanel Margin="0,0,0,10">
-                <TextBlock Text="Inserire messaggio"/>
-                <TextBox x:Name="txtBoxMessaggio" AcceptsReturn="True" TextWrapping="Wrap" Height="130"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Porta:" FontSize="30" FontWeight="DemiBold" VerticalAlignment="Center" Margin="0,0,0,10"/>
+            <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtBoxPorta" FontSize="30" FontWeight="Bold" Margin="10,0,0,10"/>
+
+            <Button Grid.Row="3" Grid.ColumnSpan="2" x:Name="btnEntra" Content="Entra!" FontSize="30" FontWeight="DemiBold" Click="btnEntra_Click"/>
+        </Grid>
+
+        <Grid x:Name="gridChat" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ListBox x:Name="lstBoxMessaggi" Grid.Column="0" Grid.RowSpan="2" Margin="8"/>
+
+            <DockPanel Grid.Column="1" Grid.Row="0" Margin="8">
+                <TextBlock Text="Agenda" DockPanel.Dock="Top"/>
+                <ListBox x:Name="lstBoxAgenda" SelectionChanged="lstBoxAgenda_SelectionChanged"/>
+            </DockPanel>
+
+            <StackPanel Grid.Column="1" Grid.Row="1" Margin="8">
+                <StackPanel Margin="0,0,0,10">
+                    <TextBlock Text="Inserire messaggio"/>
+                    <TextBox x:Name="txtBoxMessaggio" AcceptsReturn="True" TextWrapping="Wrap" Height="130"/>
+                </StackPanel>
+                <Button x:Name="btnInvia" Content="Invia" Height="30" Width="150" Click="btnInvia_Click"/>
             </StackPanel>
-            <Button x:Name="btnInvia" Content="Invia" Height="30" Width="150" Click="btnInvia_Click"/>
-        </StackPanel>
+        </Grid>
     </Grid>
+    
 </Window>
