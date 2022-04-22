@@ -7,6 +7,8 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using ClassiComuni;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ChatSocket
 {
@@ -173,6 +175,11 @@ namespace ChatSocket
                         this.Dispatcher.BeginInvoke(new Action(() =>
                         {
                             _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[1]));
+                            if (lstBoxAgenda.SelectedItem == null || !(lstBoxAgenda.SelectedItem as Mittente).Equals(mit))
+                            {
+                                _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].MessaggiNonVisualizzati++;
+                                lstBoxAgenda.Items.Refresh();
+                            }
                         }));
                     }
                     else
@@ -190,6 +197,11 @@ namespace ChatSocket
                             this.Dispatcher.BeginInvoke(new Action(() =>
                             {
                                 _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[4]));
+                                if (lstBoxAgenda.SelectedItem == null || !(lstBoxAgenda.SelectedItem as Mittente).Equals(mit))
+                                {
+                                    _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].MessaggiNonVisualizzati++;
+                                    lstBoxAgenda.Items.Refresh();
+                                }
                             }));
                         }
                         else if (messaggioSplit[1] == OperazioniChatBroadcast.Esci.ToString())
@@ -222,6 +234,7 @@ namespace ChatSocket
                     //Mando il messaggio al remote endpoint
                     _socket.SendTo(messaggio, remote_endpoint);
                     _listaMittenti[(lstBoxAgenda.SelectedItem as Mittente).MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(_mittente, messaggioString.Split('|')[1]));
+                    txtBoxMessaggio.Clear();
                 }
                 else
                 {
@@ -260,6 +273,7 @@ namespace ChatSocket
                     {
                         mit.ListaMessaggi.Add(new Messaggio(_mittente, messaggioString.Split('|')[2]));
                     }
+                    txtBoxMessaggio.Clear();
                 }
                 else
                 {
@@ -277,6 +291,8 @@ namespace ChatSocket
             if(lstBoxAgenda.SelectedIndex != -1)
             {
                 lstBoxMessaggi.ItemsSource = _listaMittenti[(lstBoxAgenda.SelectedItem as Mittente).MittenteRegistrato(_listaMittenti)].ListaMessaggi;
+                _listaMittenti[(lstBoxAgenda.SelectedItem as Mittente).MittenteRegistrato(_listaMittenti)].MessaggiNonVisualizzati = 0;
+                lstBoxAgenda.Items.Refresh();
             }
         }
 

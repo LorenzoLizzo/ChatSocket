@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace ClassiComuni
 {
@@ -15,9 +16,10 @@ namespace ClassiComuni
             Nominativo = nominativo;
             IndirizzoIP = indirizzoIP;
             Porta = porta;
+            MessaggiNonVisualizzati = 0;
             ListaMessaggi = new ObservableCollection<Messaggio>();
         }
-
+        public int MessaggiNonVisualizzati { get; set; }
         public string Nominativo { get; private set; }
         public string IndirizzoIP { get; private set; }
         public int Porta { get; private set; }
@@ -35,7 +37,14 @@ namespace ClassiComuni
         }
         public override string ToString()
         {
-            return Nominativo;
+            if (MessaggiNonVisualizzati == 0)
+            {
+                return Nominativo;
+            }
+            else
+            {
+                return Nominativo + $"   (Messaggi non letti: {MessaggiNonVisualizzati})";
+            }
         }
         public bool Equals(Mittente other)
         {

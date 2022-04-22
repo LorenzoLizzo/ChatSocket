@@ -87,7 +87,6 @@ namespace BroadcastSocket
                         Invia(_listaMittenti, messaggioSplit[0], OperazioniChatBroadcast.Esci, from, port);
                     }
                 }
-                //Thread.Sleep(100);
             }
         }
 
