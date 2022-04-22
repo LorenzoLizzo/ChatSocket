@@ -65,18 +65,25 @@ namespace ChatSocket
         }
         private void Setup()
         {
-            _nomeUtente = txtBoxNomeUtente.Text;
-            PORTA = int.Parse(txtBoxPorta.Text);
-            gridPorta.Visibility = Visibility.Collapsed;
-            gridChat.Visibility = Visibility.Visible;
+            try
+            {
+                _nomeUtente = txtBoxNomeUtente.Text;
+                PORTA = int.Parse(txtBoxPorta.Text);
+                gridPorta.Visibility = Visibility.Collapsed;
+                gridChat.Visibility = Visibility.Visible;
 
-            _listaMittenti = new ObservableCollection<Mittente>();
-            lstBoxAgenda.ItemsSource = _listaMittenti;
+                _listaMittenti = new ObservableCollection<Mittente>();
+                lstBoxAgenda.ItemsSource = _listaMittenti;
 
-            SetupSocket();
-            _mittente = new Mittente("Tu", (_socket.LocalEndPoint as IPEndPoint).Address.ToString(), PORTA);
-            NotificaConnessione();
-            SetupRicezione();
+                SetupSocket();
+                _mittente = new Mittente("Tu", (_socket.LocalEndPoint as IPEndPoint).Address.ToString(), PORTA);
+                NotificaConnessione();
+                SetupRicezione();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
         private void SetupSocket()
         {
@@ -99,25 +106,41 @@ namespace ChatSocket
         }
         private void NotificaConnessione()
         {
-            //Endpoint broadcast
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Broadcast, PORTA_BROADCAST);
-            //Creo il messaggio da inviare in broadcast
-            string messaggioString = $"{_nomeUtente}|{OperazioniChatBroadcast.Entra}";
-            //Converto il messaggio da inviare in byte
-            byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
-            //Mando il messaggio al remote endpoint
-            _socket.SendTo(messaggio, endpoint);
+            //Notifico in broadcast che mi sto connettendo alla chat
+            try
+            {
+                //Endpoint broadcast
+                IPEndPoint endpoint = new IPEndPoint(IPAddress.Broadcast, PORTA_BROADCAST);
+                //Creo il messaggio da inviare in broadcast
+                string messaggioString = $"{_nomeUtente}|{OperazioniChatBroadcast.Entra}";
+                //Converto il messaggio da inviare in byte
+                byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
+                //Mando il messaggio al remote endpoint
+                _socket.SendTo(messaggio, endpoint);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
         private void NotificaDisconnessione()
         {
-            //Endpoint broadcast
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Broadcast, PORTA_BROADCAST);
-            //Creo il messaggio da inviare in broadcast
-            string messaggioString = $"{_nomeUtente}|{OperazioniChatBroadcast.Esci}";
-            //Converto il messaggio da inviare in byte
-            byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
-            //Mando il messaggio al remote endpoint
-            _socket.SendTo(messaggio, endpoint);
+            //Notifico in broadcast che mi sto disconnettendo dalla chat
+            try
+            {
+                //Endpoint broadcast
+                IPEndPoint endpoint = new IPEndPoint(IPAddress.Broadcast, PORTA_BROADCAST);
+                //Creo il messaggio da inviare in broadcast
+                string messaggioString = $"{_nomeUtente}|{OperazioniChatBroadcast.Esci}";
+                //Converto il messaggio da inviare in byte
+                byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
+                //Mando il messaggio al remote endpoint
+                _socket.SendTo(messaggio, endpoint);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
         private void SetupRicezione()
         {
@@ -135,68 +158,48 @@ namespace ChatSocket
         }
         private void RicezioneMessaggi()
         {
-            //Non so chi è il remoteEndPoint quindi imposto i valori di default
-            EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            while (true)
+            try
             {
-                string messaggio = string.Empty;
-
-                // Variabile per contare i byte ricevuti
-                int nBytes = 0;
-
-                if ((nBytes = _socket.Available) > 0) // Evita di bloccarsi sulla ReceiveFrom() in assenza di dati
+                //Non so chi è il remoteEndPoint quindi imposto i valori di default
+                EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                while (true)
                 {
-                    byte[] buffer = new byte[nBytes];
+                    string messaggio = string.Empty;
 
-                    //Ricezione dei caratteri in attesa
-                    nBytes = _socket.ReceiveFrom(buffer, ref remoteEndPoint);
+                    // Variabile per contare i byte ricevuti
+                    int nBytes = 0;
 
-                    // Decodifico ciò che ho ricevuto in stringa
-                    messaggio = Encoding.UTF8.GetString(buffer, 0, nBytes);
-
-                    // Recupero il mittente e mi memorizzo il suo indirizzo ip
-                    string from = ((IPEndPoint)remoteEndPoint).Address.ToString();
-                    // Recupero il mittente e mi memorizzo la sua porta
-                    int port = ((IPEndPoint)remoteEndPoint).Port;
-
-                    string[] messaggioSplit = messaggio.Split('|');
-
-                    if(port != PORTA_BROADCAST)
+                    if ((nBytes = _socket.Available) > 0) // Evita di bloccarsi sulla ReceiveFrom() in assenza di dati
                     {
-                        Mittente mit = new Mittente(messaggioSplit[0], from, port);
-                        int indice = mit.MittenteRegistrato(_listaMittenti);
-                        if (indice == -1)
+                        byte[] buffer = new byte[nBytes];
+
+                        //Ricezione dei caratteri in attesa
+                        nBytes = _socket.ReceiveFrom(buffer, ref remoteEndPoint);
+
+                        // Decodifico ciò che ho ricevuto in stringa
+                        messaggio = Encoding.UTF8.GetString(buffer, 0, nBytes);
+
+                        // Recupero il mittente e mi memorizzo il suo indirizzo ip
+                        string from = ((IPEndPoint)remoteEndPoint).Address.ToString();
+                        // Recupero il mittente e mi memorizzo la sua porta
+                        int port = ((IPEndPoint)remoteEndPoint).Port;
+
+                        string[] messaggioSplit = messaggio.Split('|');
+
+                        if (port != PORTA_BROADCAST)
                         {
-                            this.Dispatcher.BeginInvoke(new Action(() =>
+                            Mittente mit = new Mittente(messaggioSplit[0], from, port);
+                            int indice = mit.MittenteRegistrato(_listaMittenti);
+                            if (indice == -1)
                             {
-                                _listaMittenti.Add(mit);
-                            }));
-                        }
-                        this.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[1]));
-                            if (lstBoxAgenda.SelectedItem == null || !(lstBoxAgenda.SelectedItem as Mittente).Equals(mit))
-                            {
-                                _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].MessaggiNonVisualizzati++;
-                                lstBoxAgenda.Items.Refresh();
+                                this.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    _listaMittenti.Add(mit);
+                                }));
                             }
-                        }));
-                    }
-                    else
-                    {
-                        Mittente mit = new Mittente(messaggioSplit[0], messaggioSplit[2], int.Parse(messaggioSplit[3]));
-                        if (messaggioSplit[1] == OperazioniChatBroadcast.Entra.ToString())
-                        {
                             this.Dispatcher.BeginInvoke(new Action(() =>
                             {
-                                _listaMittenti.Add(mit);
-                            }));
-                        }
-                        else if (messaggioSplit[1] == OperazioniChatBroadcast.InviaMessaggio.ToString())
-                        {
-                            this.Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[4]));
+                                _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[1]));
                                 if (lstBoxAgenda.SelectedItem == null || !(lstBoxAgenda.SelectedItem as Mittente).Equals(mit))
                                 {
                                     _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].MessaggiNonVisualizzati++;
@@ -204,16 +207,47 @@ namespace ChatSocket
                                 }
                             }));
                         }
-                        else if (messaggioSplit[1] == OperazioniChatBroadcast.Esci.ToString())
+                        else
                         {
-                            this.Dispatcher.BeginInvoke(new Action(() =>
+                            Mittente mit = new Mittente(messaggioSplit[0], messaggioSplit[2], int.Parse(messaggioSplit[3]));
+                            if (messaggioSplit[1] == OperazioniChatBroadcast.Entra.ToString())
                             {
-                                _listaMittenti.Remove(mit);
-                            }));
+                                this.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    _listaMittenti.Add(mit);
+                                }));
+                            }
+                            else if (messaggioSplit[1] == OperazioniChatBroadcast.InviaMessaggio.ToString())
+                            {
+                                this.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].ListaMessaggi.Add(new Messaggio(mit, messaggioSplit[4]));
+                                    if (lstBoxAgenda.SelectedItem == null || !(lstBoxAgenda.SelectedItem as Mittente).Equals(mit))
+                                    {
+                                        _listaMittenti[mit.MittenteRegistrato(_listaMittenti)].MessaggiNonVisualizzati++;
+                                        lstBoxAgenda.Items.Refresh();
+                                    }
+                                }));
+                            }
+                            else if (messaggioSplit[1] == OperazioniChatBroadcast.Esci.ToString())
+                            {
+                                this.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    _listaMittenti.Remove(mit);
+                                }));
+                            }
                         }
                     }
+                    Thread.Sleep(100);
                 }
-                Thread.Sleep(100);
+            }
+            catch(Exception ex)
+            {
+                if(ex.Message != "Thread interrotto.")
+                {
+                    MessageBox.Show(ex.Message);
+                }
+               
             }
         }
 
@@ -261,13 +295,13 @@ namespace ChatSocket
             {
                 if (!txtBoxMessaggio.Text.Contains("|"))
                 {
-                    //Socket destinatario
+                    //Broadcast
                     IPEndPoint remote_endpoint = new IPEndPoint(IPAddress.Broadcast, PORTA_BROADCAST);
-                    //Creo il messaggio da inviare al remote endpoint
+                    //Creo il messaggio da inviare in broadcast
                     string messaggioString = $"{_nomeUtente}|{OperazioniChatBroadcast.InviaMessaggio}|{txtBoxMessaggio.Text}";
                     //Converto il messaggio in byte
                     byte[] messaggio = Encoding.UTF8.GetBytes(messaggioString);
-                    //Mando il messaggio al remote endpoint
+                    //Mando il messaggio
                     _socket.SendTo(messaggio, remote_endpoint);
                     foreach (Mittente mit in _listaMittenti)
                     {
@@ -288,6 +322,7 @@ namespace ChatSocket
 
         private void lstBoxAgenda_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
+            //Aggiorno i messaggi in base alla selezione nell'agenda
             if(lstBoxAgenda.SelectedIndex != -1)
             {
                 lstBoxMessaggi.ItemsSource = _listaMittenti[(lstBoxAgenda.SelectedItem as Mittente).MittenteRegistrato(_listaMittenti)].ListaMessaggi;
@@ -302,6 +337,7 @@ namespace ChatSocket
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            //interrompo il thread e notifico la mia disconnessione
             if (_threadRicezione != null && _threadRicezione.IsAlive)
             {
                 _threadRicezione.Abort();

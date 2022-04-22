@@ -28,6 +28,7 @@ namespace BroadcastSocket
             {
                 //Con InterNetwork specifico che comunico ipv4 mentre con Dgram specifico che utilizzo il protocollo udp
                 _socketBroadcast = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                //Attivo il broadcast
                 _socketBroadcast.EnableBroadcast = true;
                 //Imposto l'indirizzo ip del mittente (colui che invia messaggi)
                 IPAddress local_address = IPAddress.Any;
@@ -38,89 +39,110 @@ namespace BroadcastSocket
             }
             catch (Exception ex)
             {
-                throw ex;
+                Console.WriteLine(ex.Message);
             }
         }
 
         private static void RicezioneMessaggiBroadcast()
         {
-            //Non so chi è il remoteEndPoint quindi imposto i valori di default
-            EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            while (true)
+            try
             {
-                string messaggio = string.Empty;
-
-                // Variabile per contare i byte ricevuti
-                int nBytes = 0;
-
-                if ((nBytes = _socketBroadcast.Available) > 0) // Evita di bloccarsi sulla ReceiveFrom() in assenza di dati
+                //Non so chi è il remoteEndPoint quindi imposto i valori di default
+                EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                while (true)
                 {
-                    byte[] buffer = new byte[nBytes];
+                    string messaggio = string.Empty;
 
-                    //Ricezione dei caratteri in attesa
-                    nBytes = _socketBroadcast.ReceiveFrom(buffer, ref remoteEndPoint);
+                    // Variabile per contare i byte ricevuti
+                    int nBytes = 0;
 
-                    // Decodifico ciò che ho ricevuto in stringa
-                    messaggio = Encoding.UTF8.GetString(buffer, 0, nBytes);
-
-                    // Recupero il mittente e mi memorizzo il suo indirizzo ip
-                    string from = ((IPEndPoint)remoteEndPoint).Address.ToString();
-                    // Recupero il mittente e mi memorizzo la sua porta
-                    int port = ((IPEndPoint)remoteEndPoint).Port;
-
-                    string[] messaggioSplit = messaggio.Split('|');
-                    Mittente mit = new Mittente(messaggioSplit[0], from, port);
-                    if (messaggioSplit[1] == OperazioniChatBroadcast.Entra.ToString())
+                    if ((nBytes = _socketBroadcast.Available) > 0) // Evita di bloccarsi sulla ReceiveFrom() in assenza di dati
                     {
-                        Invia(_listaMittenti.AsEnumerable(), messaggioSplit[0], OperazioniChatBroadcast.Entra, from, port);
-                        GetUtentiConnessi(_listaMittenti.AsEnumerable(), from, port);
+                        byte[] buffer = new byte[nBytes];
 
-                        _listaMittenti.Add(mit);
-                    }
-                    else if (messaggioSplit[1] == OperazioniChatBroadcast.InviaMessaggio.ToString())
-                    {
-                        Invia(_listaMittenti.Where(x => !x.Equals(mit)), messaggioSplit[0], OperazioniChatBroadcast.InviaMessaggio, from, port, messaggioSplit[2]);
-                    }
-                    else if (messaggioSplit[1] == OperazioniChatBroadcast.Esci.ToString())
-                    {
-                        _listaMittenti.Remove(mit);
-                        Invia(_listaMittenti, messaggioSplit[0], OperazioniChatBroadcast.Esci, from, port);
+                        //Ricezione dei caratteri in attesa
+                        nBytes = _socketBroadcast.ReceiveFrom(buffer, ref remoteEndPoint);
+
+                        // Decodifico ciò che ho ricevuto in stringa
+                        messaggio = Encoding.UTF8.GetString(buffer, 0, nBytes);
+
+                        // Recupero il mittente e mi memorizzo il suo indirizzo ip
+                        string from = ((IPEndPoint)remoteEndPoint).Address.ToString();
+                        // Recupero il mittente e mi memorizzo la sua porta
+                        int port = ((IPEndPoint)remoteEndPoint).Port;
+                        //Divido il messaggio 
+                        string[] messaggioSplit = messaggio.Split('|');
+                        Mittente mit = new Mittente(messaggioSplit[0], from, port);
+                        if (messaggioSplit[1] == OperazioniChatBroadcast.Entra.ToString())
+                        {
+                            Invia(_listaMittenti.AsEnumerable(), messaggioSplit[0], OperazioniChatBroadcast.Entra, from, port);
+                            GetUtentiConnessi(_listaMittenti.AsEnumerable(), from, port);
+
+                            _listaMittenti.Add(mit);
+                        }
+                        else if (messaggioSplit[1] == OperazioniChatBroadcast.InviaMessaggio.ToString())
+                        {
+                            Invia(_listaMittenti.Where(x => !x.Equals(mit)), messaggioSplit[0], OperazioniChatBroadcast.InviaMessaggio, from, port, messaggioSplit[2]);
+                        }
+                        else if (messaggioSplit[1] == OperazioniChatBroadcast.Esci.ToString())
+                        {
+                            _listaMittenti.Remove(mit);
+                            Invia(_listaMittenti, messaggioSplit[0], OperazioniChatBroadcast.Esci, from, port);
+                        }
                     }
                 }
             }
+            catch(Exception ex)
+            {
+                Console.Write(ex.Message);
+            }  
         }
 
         private static void Invia(IEnumerable<Mittente> lista, string nominativo, OperazioniChatBroadcast operazione, string from, int port, string messaggioBroadcast = "")
         {
-            foreach (Mittente item in lista)
+            try
             {
-                //Indirizzo ip del destinatario
-                IPAddress remote_address = IPAddress.Parse(item.IndirizzoIP);
-                //Socket destinatario
-                IPEndPoint remote_endpoint = new IPEndPoint(remote_address, item.Porta);
-                //Creo il messaggio da inviare al remote endpoint
-                string messaggioString = $"{nominativo}|{operazione}|{from}|{port}|{messaggioBroadcast}";
-                //Converto il messaggio in byte
-                byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
-                //Mando il messaggio al remote endpoint
-                _socketBroadcast.SendTo(msg, remote_endpoint);
+                foreach (Mittente item in lista)
+                {
+                    //Indirizzo ip del destinatario
+                    IPAddress remote_address = IPAddress.Parse(item.IndirizzoIP);
+                    //Socket destinatario
+                    IPEndPoint remote_endpoint = new IPEndPoint(remote_address, item.Porta);
+                    //Creo il messaggio da inviare al remote endpoint
+                    string messaggioString = $"{nominativo}|{operazione}|{from}|{port}|{messaggioBroadcast}";
+                    //Converto il messaggio in byte
+                    byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
+                    //Mando il messaggio al remote endpoint
+                    _socketBroadcast.SendTo(msg, remote_endpoint);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
             }
         }
 
         private static void GetUtentiConnessi(IEnumerable<Mittente> lista, string from, int port)
         {
-            //Indirizzo ip del destinatario
-            IPAddress remote_address = IPAddress.Parse(from);
-            //Socket destinatario
-            IPEndPoint remote_endpoint = new IPEndPoint(remote_address, port);
-            foreach (Mittente item in lista)
+            try
             {
-                //Creo il messaggio da inviare al remote endpoint
-                string messaggioString = $"{item.Nominativo}|{OperazioniChatBroadcast.Entra}|{item.IndirizzoIP}|{item.Porta}";
-                //Converto il messaggio in byte
-                byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
-                //Mando il messaggio al remote endpoint
-                _socketBroadcast.SendTo(msg, remote_endpoint);
+                //Indirizzo ip del destinatario
+                IPAddress remote_address = IPAddress.Parse(from);
+                //Socket destinatario
+                IPEndPoint remote_endpoint = new IPEndPoint(remote_address, port);
+                foreach (Mittente item in lista)
+                {
+                    //Creo il messaggio da inviare al remote endpoint
+                    string messaggioString = $"{item.Nominativo}|{OperazioniChatBroadcast.Entra}|{item.IndirizzoIP}|{item.Porta}";
+                    //Converto il messaggio in byte
+                    byte[] msg = Encoding.UTF8.GetBytes(messaggioString);
+                    //Mando il messaggio al remote endpoint
+                    _socketBroadcast.SendTo(msg, remote_endpoint);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
             }
         }
     }
